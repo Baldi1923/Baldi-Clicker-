@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baldi Clicker</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #66d66a, #159447);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    user-select: none;
+  }
+  .game {
+    width: min(900px, 94vw);
+    min-height: 620px;
+    background: rgba(0,0,0,.28);
+    border: 4px solid #fff;
+    border-radius: 24px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(38px, 7vw, 68px);
+    text-shadow: 4px 4px 0 #000;
+  }
+  .score {
+    font-size: 34px;
+    font-weight: bold;
+    margin: 10px 0 18px;
+  }
+  .click-zone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 330px;
+  }
+  #baldi {
+    width: 180px;
+    height: auto;
+    image-rendering: pixelated;
+    cursor: pointer;
+    filter: drop-shadow(0 10px 5px rgba(0,0,0,.35));
+    transition: transform .08s;
+  }
+  #baldi:active { transform: scale(.9) rotate(-2deg); }
+  .buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  button {
+    border: 3px solid #111;
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #ffd83d;
+    box-shadow: 0 5px 0 #111;
+  }
+  button:active { transform: translateY(4px); box-shadow: 0 1px 0 #111; }
+  #message {
+    height: 30px;
+    margin-top: 16px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .pop {
+    position: fixed;
+    pointer-events: none;
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px #000;
+    animation: pop .65s ease-out forwards;
+  }
+  @keyframes pop {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-80px) scale(1.3); }
+  }
+</style>
+</head>
+<body>
+<div class="game">
+  <h1>Baldi Clicker</h1>
+  <div class="score">Clicks: <span id="score">0</span></div>
+
+  <div class="click-zone">
+    <img id="baldi" src="data:image/webp;base64,UklGRoATAABXRUJQVlA4THMTAAAvOcAiEAFHbttIEqze26n/fzhJ9azniP5PgD5yadlaacSw1OGeOY8toqHV7gxJligu8DYouIBtA5Jrigk/kr5im3FFswouT7ihhXSPTBn8ORGdAexWkhRJT62hz+VjBjvWf2uO+bMmVzoLnNq2rSoTJzEO7hJf5FOIfDqRSGIc3BmuI8lWlcHd3ff5e/BJ/rkQgj05eP8nAP4/Fy4sMsJupMf65P47Sq5xLbg/H665C5vrJ8GKj6amf/p3z5/R1ygMjkUrmprBMXdheOwUwMvqvBFvHI6fP5jv0EGiE+vEnVfDHDTIlBSgwwx/aJAmDaD740zFjx943mWKQehbYylTmQJMaOgUle/Hc+t6lQbQoeFJUYHn0hNpkDukdoYBzZnBT75YumbSRC7gRaky+Njn4JoBRpOXYyryQgv4spUZhmGCruP9Hf3CyH1Z+eALxhtgU/aGzrh4m3kvK5fPYjUEuvdVQRee9aQAIZoLMdBdEIRoQQDXhaL9SAD7kSIEYCMUCGwFoIA4sAYBQyEUCBAgIQgZIkDXhRhmgOAAID4AoYAzQ2CpqgSI4MPQM5ZUXlDcto0jef+tr9d3REwAH6u6j0usOeQI7TksDGBDEhI6U64hw3RW1joykc5KL0noD21P2LYZsq1t2xWRmZWZxTFmDY9l27ZttFbX7Kppd23btm1reg57jEIqMqNROdcWFd2la9lrrObcas1l+/Z9L/Vu2+zZNhp0bdtSJDnnvogormFmJlPsyWLZbLUtW/oEWczMDP+APrPkMqu5qjoj3qNk27ZpWxpzrX0u370/bNu2UQDbqELkbKd+JFmGSMYvQBTAtvGMf949Z69Fi7ZtU5I0HzLKtm3btm1XtW3b/LNt27bKtm0GKuJNAGXXttVIkv1sF///j3KE37MHro/YoUJncTVfWW5mhje4zd0Jsyy5lNDMZMmt25KbSXLUSJIjRfaeAXD8Od7bTSNq20bO3f/44zwCjQmQI4GSYjfdI5kP4PJNfFvfUzAd9QZ9gudI0Kpqs3jM7A0Fo/qhQRCamZmZNnAQSZLQ9FCYwRIi8F8FyTqIbVtVruISgSSU8KTEcueq01rbnubSUSjmaEswGBuVDBHVXCQqJ66q/k8AQIC3+txwcGvDumsOqpY4OuFTxZlZUW/8teCSGk93r49c7nE9usJTlJdtPW4Zmjo9ubTmsgN7qgOvmDo5YWjkxvyFgfbl7+Nx0l8tv86WAxxFuTe7dF+qXesPpm12bhWUSpSFqEsMNAkD148wzWRTddkwoU3aLqP2PbmWrBeWHqb/PkkzGxbTqJSaO7oFrXSY0GqY2DrMJMAxxEMlAIVSJTS5w/DhsGRbQgQtVQ6iAiOgmPgIFyAkkFBBxQrVAwKJFrn1nGEQnJvb/6eO3atg/CfotxKtmPu/EyAIFBk8WdeLXF7WXKmF6zoMmukZeWa/5c/Sp71//HUV7NLVoU3G/3fCLGLimESXeRSVABBUSYN17MGaYG26cr9P9pWRxu+8qTnpyuuq4stT462NafVg6YLmXb8JAggB9OpE+r/jdMW28lGnY/wzK0JmmTHSKMZMQAx6HUxcroOcPJZFdIT597fcyQrFQBYuPsMRfpzLto53c/xh1ekVpjv9lw42KJmbpKHh/a0FkrFg15ETtwlIWtjlIX2B4RVjRyu5jm251H5qsJAVJmda45Lrzhv8SpXNnv+4jSQr2aiuAhV0g8nAjFxqVr/SeDrTOGlX+/QPXFDDjWt4uG02d8jGEsPnknnFQqB3FBRUFaQukkDQVUMNcxYC2wX9bal+iPR68ekyvxmewwDcT3Uk14ogBrwOQX9Bz7g3LwDkJElbOaAkTvleMHq8AaynlAWndLpTJxeYmSVaQpdERQIlRcYBtlK+mSzwUJEkAD+PFWW9XkIfLScWggbHe9Ux1AW6QozacBJaEqLAkXBgJ3iBvoQWtLPd9b0kWAnv1Liw4tyAjRB3LPdIoA+MWZBzk0FcNwy4FZzgdY5bUGAvQEaWHP5iqvYbeddTO8Nyckk6IJIeq5oCeUtBkrwBTJ5UKOzU8ueeRMg7UFaAfSlYHTOr+GFmYAwbIg1RM/U0oji/OjWEzJ1VoQxTgARzpwziPyM4Kg2WWd5ZUbxiMovWpWCWNBe1FrQi7k5v6J1g0EXXfMzEf3fKuvgpjqSGzZ0oMUdZgnKxhYEDf7vmbrCfUXbRREyCv0zbcpW7Uip+MOPPWwxAYSxKTaG/AjUJ5vLz4u8z7QWwQOAysTvlq1T5F06yGRjZW2OX41Nybbz0RsihreqY/Kd0Q5YJ7keqa8RKCKoBSyNMynbzZnb32qcAJAcoECFt7id5Q37QcxX6fcRM+SbApyj/RlfsXXxFpkO7uQo6CQBtIJcXGwBmorS7cXSjuUbd9VFl8QYv/xvBJRUVCPB1rNYvstS9ux9+pVrzN/GTvhiZpKVyS54wcBsv1t2nRpPt9zrxuQ9IofE1w6AHaOL5G5rqjyNK37A6bV6siXtRpQd+mb0LKcNpKuJC1BGvUAMGoKYT2T1aesSz+/u0XZT6KnUVvQXz3DVttOKz03/KR1SMIN9XEwjICw2RJgrjB39dtzypW6S5c1xjCdxdjYU9cAOAIQwIpyQp60AQdSHcQJuwDHMd+hyQTGQBCn7phzgICWRBq8nkgEO5luCq4gD82BWcsUFHoKFJTkZthlg6xSK3Sv6vUoi0s6xyHada1VHxDGv47hCTVjd2TTGna3Hc4AdbkfUSIgHHwENoiIkx8qrKUiApSeJSrF4KSj7S7UVfBgeKUe2Q5Un9ogQ5f807VYhBd/EMf/2O7/JMVl5k8UAiqpqJ8hE6kk4lG+MDHjRMd9miKL2RFXwLXGI4WkC2AUh/RPPMYzC42eWU000HfmEK1CMtSI50f1cvri7G8uNBbyuoq2A4Uh6uAbgSHuYh/5NR4jRdTJOQKF9EFfiiimCnwTWhktpmdYpBoFKfIgUGCFSYNDoe/uSXsrHA1azLKKtBw3QTlRIypKM1coLj4KLaDjPrU4QUjPGFJ/SQunDtAWopMPw7ndxU2ysXi0KdoviqMxyYFL9YJlhZejN+bcjKjbNJoyJUmI1kGV+Mg9rC/wydIAh3CUJAxwNURputUANIvfiiH5gEuNO5nhp6LREHLdZT6XehsIpie/NEid9/1sBrjoG/6sNBxBLfkiaoLvTB9sfuqjzR4qNaS6l/NrXn6t6SGTYt+5eIyjStgshtThBSQZeYhfa01GtVKI2I2b31vM7FDeiKfDshOyANKOKIa/ZMl0tG4a9mo3BMzOoIAkhO29V91w3tSMGoBCpuSKOvn+kOAhFSw5eqI1kbG5wzXi/rvX9/pwYscciXp1yaj8hlLFkBgPLllYWiKmZab1kghvtMU5VZp3YG4D7EV9WU1r/dPldVv8TqfBrraUegxAQfSi27GL/aTe7srLBJESEiiubr94GYYG5rlNA+xxVhyUocGqj6X0qKIKqS5Y7KpP+on7rfea/lSAnNFIGOCh05ZJL00x6XL0WWEtPRi396iDZKwmiroAsOASwBiKGiSr0KTiFPvGbU2pKqIvoRIk5plslG3tlTxQ7kWzKCVNmAXmI08kc3KGKGiIsnEONeRGiHdAr5DQyc3oy6I/2vugGRVEsmNNI5UmdJtoyeI65L/XQxTU4JyzIwHBFJVum6Ug8VmNczB1ZHVQCRq/OAOi6IZycVj8H3jrQ2Ww0jjKgnGhI3pMUAZKgjiSSTDDCtuVH8VxCI7WlylfwDZGJgAHQTRBtCgMPM7GQGyZbUWTHCG2I8hZf8JH4kAw4A7CtwddddxYqiPAq/x74KIuo4EEuYEgGScOPzr4XSp8RoIb6BtgCIbxZiYVpj9cf/Iy3aOeKOSJ40EQMi4kvvYoBxKcRAJM1FMeGkz4R8lPP+XX1d46NttpBZ6J9hLgUxiBwB8V0x5eslJXBDiFOoda2tb/WRvipRmm2jW7qbWUDRxR8b/CLEK9I9LPqjGjCoPMFZG1rdQ5t4hncF1e9/v9tgThByiFr5ZU2FokBYAULvFiA4kWUBsSSmnpDl0Zu7MyGvpePMJ/Cxj4D33a4XDYsnZsD+EqJjIkaEfExdm9tCtM1uMR6sCoDR9CPJJ7Y/A5wtAN8Vk2zFieXiUjZE9NuiVq8V6YGcf604dHmG3ASkR7QoO/8LcWP3mfW8pu1PQefDZh/xhB0oASi1Kyp+RceEEFqzB234EyzU3AusLawOcOx29utNVBflNJ0FITa7K5yC3gaTAdOoBwYHAIxK/uqD7wg6fPORfZQRQs5F/2VH61xBRFfWG6JhoxyA47UIv/lHCAj66oB2/P/2Llch7Y8Hnj344B1dYfO5thehGDQBdvhoCwt8RxC11s6sLDUI2SEpalMDnUwNUV5sAGyxYOWjH5TEPPrJp1Oy7xpgFSLqk/Uvlh+/PGpACooBfd9At0Z8z9ffFZMUPk4cJjoCcAYRWXeD/N5rhzSmAv1zUBWmqxobXrc/wa89JOZd7sG+JpBf/X1ERElGPcNN4zmnygRymyeFkWzMgCvmN4oWeGhvcQuoSJaeGCoyXMoN7vUuva5VAGv1wl5vZ4WuDaFZHgMgb7X3VEuPDjB6AzACjETMuE2X7XPt4LGD90js1pkwspDmXB8j6DmzRukDfBeDud0Z2WXBxC+8i35yr8xbpxDzVm4UZzNdYMsyktFw9cQcAjbpKoN7NGIgAOOR+daHqWVJtT/OJia7He07VojBcc5pq2rF1T8sJyPZCcfF0eefwVDsg2VMzXEgzlq3My6lV1OiQZ+kTWYEX+INgrZ7+K2na0/VnR2/U27lD94uHjb8vKAglbePFFtU9JrUH6obEK+GYMq1+dmEF0MxN1H0soznIAggD6m7v5IYMn7QOuS7f2QNURnL8JNv/hERf4d/fBp//K7jCfFcSJaGTGfo1H/LBVQoBGH71qx4FehJNY2IABkCBWqgXlF6JNIfmRX4R8Rffud3qnpGVEB4zWHoixwSgHQC4haYODDHPR0JgZHkPPMGw0CUa7H4JsrpJmwg4m8BWqZFn4B84opy2hY2Pq2BFQfgQqz7dztFTyroNfzmaN94s5nRW0foEno6EtHY/6dd++QdFjypBIM4NIxAuisY7UeT0SRaym0T7uIFzykvCuAnUzp8Q6+9esdb36qBCHAU4I919z/56C6T6yqldCJajuJao13dMoCLAOZwaKSTjSiMB5i5+sVLx2+9dQZzfDO9fwoAI8ZnNHkO4MdRAAmXMlpvQSMoXVPI0x/nyuWicLi1NFH5ImiMiFjRvqtq0JYVQAqs0ftMEQE2/w2xevnf0ma3YG4sMzb+1T/+px/GABEUjduNIpOyDUTYOjvoRCbtPi9sekZHJ8UWA/xaoKS1hJq7zUBICUMJjtPiEUbTKLz465KGLTal0ZkoetyT9mp4EhfFhHGLey8q2+2mMLUvQMAlSGoi0boIG0U0wBUg5F1OtG8A9D1D6pQPValSPmTi+2NSQdghjWWTd/PNTarpECAR4lX8pzDGIQJ6jzxCKFQdkGtgReqqMmyxj8of+PUDzx7x/Z27hBFASywkhRN0CIJih/Uc1ni5V58vBvCqR7cRi56plv8kSMoeRRiBE/NN3hsJH5O5EATIY/EFoZRjooQReHH+/FjBRJiMw0aI4FTMDHUWBiFRRYQ8tMJGCimifVTYBy0QRwjkJR0zcvu2CNmT4hNwlydtNrbCOYoSk1kBk788LCscFED2k/ekdI8YKALqJQ4/VUmaNA/cRDfjoihOAxWZNZzoIg14hLE6XBjYLVbyBqgEUdIYTfO8PC5Q9Blt+5pdFCFoaYExJxhpmGID57tkdCRwVVLLkDkBSOKEWo4ijaRK25HMoEL8fncCVmuvz5KZ28mIl/uaYhvHMyfKZbgZoSFuhzAaYIGL5DC75zmWEhVSIsVHtX7vAALBClcDrfrUCFGeV7SW1mShA1ctLkt/dyvVPQsaR0QAOMb4605ZKHAeUV0b3oQgR8IJTXFZxq9fnKmhscTKAhxkiSxYQDDhWuIcCwvCWbk+fgQOXQSeitVXI1amOUQhv120Ocn5X5i9ThOyEmgYwCtSOivjVFnxJgAqWitiIC+cCHij25i0Ul8Bnkxok18g/mCWpUeBBddW34MN2bnTOpo+xWMBN+MAIjQkgCpIWBk2lQUAFNN2AIZmZqw4NwCs/tEAqkCZsQLhgHjWiDEmaMEMAEZCO8JDAMKQn2lAAiUCtgv03luHu53zPpkMaaSUWIj/yJIsJU1qqKEF/DxJoFJcltQsbWMy0NARoEyekGXzudpxuHbFGxSqcUMuazqnLZaFwCrsDMA1wAFhmRVQmPzx1aI96v0NGN67ioa9Rz/dUkxevq1h/G1Y+kl5tNHgp0Qjj0j08A9RoD8CXEALJQbHZxeGf8q1TPAwCmO/8x3yJFk26f5X7L43dl0nVNB2+jN2fmeKa54w33VPqD/8kfzsKNJMdN0+mX+gNtQfe4fFXymArJKgM9HO71SNd6SH26Y7/66Z7nktkEY7sL+kuo484I7ybf89jqrVyKmL5jjFcKBnCpPeGMelyXx5xNX5tA5mg/rRPeu/XfE/8cgA9mX+Gvf2F5oBMIOLQQB/SQPwLcCKj+At/RnAW/cC/IRFBAA=" alt="Baldi">
+  </div>
+
+  <div class="buttons">
+    <button id="upgrade">Upgrade Click (+1) — 25 clicks</button>
+    <button id="reset">Reset Game</button>
+  </div>
+  <div id="message">Click Baldi!</div>
+</div>
+
+<script>
+let score = Number(localStorage.getItem("baldiScore") || 0);
+let power = Number(localStorage.getItem("baldiPower") || 1);
+let cost = Number(localStorage.getItem("baldiCost") || 25);
+
+const scoreEl = document.getElementById("score");
+const baldi = document.getElementById("baldi");
+const upgrade = document.getElementById("upgrade");
+const reset = document.getElementById("reset");
+const message = document.getElementById("message");
+
+function save() {
+  localStorage.setItem("baldiScore", score);
+  localStorage.setItem("baldiPower", power);
+  localStorage.setItem("baldiCost", cost);
+}
+
+function update() {
+  scoreEl.textContent = score;
+  upgrade.textContent = `Upgrade Click (+${power + 1}) — ${cost} clicks`;
+}
+
+function popup(e) {
+  const p = document.createElement("div");
+  p.className = "pop";
+  p.textContent = "+" + power;
+  p.style.left = (e.clientX - 15) + "px";
+  p.style.top = (e.clientY - 20) + "px";
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 650);
+}
+
+baldi.addEventListener("click", (e) => {
+  score += power;
+  message.textContent = power > 1 ? `Baldi gives you ${power} clicks!` : "CLICK BALDI!";
+  popup(e);
+  save();
+  update();
+});
+
+upgrade.addEventListener("click", () => {
+  if (score >= cost) {
+    score -= cost;
+    power++;
+    cost = Math.ceil(cost * 1.65);
+    message.textContent = "Baldi Click Power upgraded!";
+    save();
+    update();
+  } else {
+    message.textContent = `You need ${cost - score} more clicks!`;
+  }
+});
+
+reset.addEventListener("click", () => {
+  if (confirm("Reset Baldi Clicker?")) {
+    score = 0;
+    power = 1;
+    cost = 25;
+    save();
+    update();
+    message.textContent = "Game reset!";
+  }
+});
+
+update();
+</script>
+</body>
+</html>
